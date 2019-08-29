@@ -6,7 +6,7 @@ import argparse
 import pandas as pd
 import datetime
 
-def DBSCAN(D, eps, MinPts,rq):
+def DBSCAN(D, eps, MinPts):
 
 	labels = [0]*(len(D))
 
@@ -17,17 +17,14 @@ def DBSCAN(D, eps, MinPts,rq):
 		if not (labels[P] == 0):
 		   continue
 
-		if rq == 0:
-			NeighborPts = regionQuery(D, P, eps)
-		else:
-			NeighborPts = regionQuery2(D, P, eps)
+		NeighborPts = regionQuery(D, P, eps)
 
 		if len(NeighborPts) < MinPts:
 			labels[P] = -1
 
 		else:
 		   C += 1
-		   growCluster(D, labels, P, NeighborPts, C, eps, MinPts,rq)
+		   growCluster(D, labels, P, NeighborPts, C, eps, MinPts)
 
 	return labels
 
@@ -48,11 +45,8 @@ def growCluster(D, labels, P, NeighborPts, C, eps, MinPts,rq):
 
 			labels[Pn] = C
 
-			if rq == 0:
-				PnNeighborPts = regionQuery(D, Pn, eps)
-			else:
-				PnNeighborPts = regionQuery2(D, Pn, eps)
-
+			PnNeighborPts = regionQuery(D, Pn, eps)
+			
 			if len(PnNeighborPts) >= MinPts:
 				NeighborPts = NeighborPts + PnNeighborPts
 
@@ -65,6 +59,7 @@ def regionQuery(D, P, eps):
 	neighbors = []
 
 	for Pn in range(0, len(D)):
+		#distance between points is determined by using  percentge threshold, it can be replaced by ny other distance metric
 		if abs(D[P][3] - D[Pn][3]) < D[P][3]*eps and D[P][2] == D[Pn][2]:
 			neighbors.append(Pn)
 
